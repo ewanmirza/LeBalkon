@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    @apply bg-dark text-cream font-heading antialiased overflow-x-hidden;
+  }
+  ::selection { background: rgba(191,161,118,.3); color: #FFF4E6; }
+}
+
+@layer components {
+  .container-site { @apply max-w-6xl mx-auto px-6 md:px-10; }
+  .btn-gold {
+    @apply inline-block font-sans text-[15px] font-medium text-gold border border-gold rounded-pill px-7 py-3
+    hover:bg-gold hover:text-dark transition-all duration-300;
+  }
+  .btn-gold-solid {
+    @apply inline-block font-sans text-[15px] font-medium bg-gold text-dark rounded-pill px-7 py-3
+    hover:bg-gold-light transition-all duration-300;
+  }
+  .eyebrow { @apply font-sans text-xs tracking-[0.3em] uppercase text-gold; }
+  .h-display { @apply font-heading font-medium text-cream; }
+  .dotted-line { border-bottom: 2px dotted rgba(191,161,118,.3); }
+  .input-dark {
+    @apply w-full bg-dark-2 border border-gold/20 rounded-lg px-4 py-3 font-sans text-sm text-cream
+    placeholder:text-muted2 focus:outline-none focus:border-gold transition-colors;
+  }
+}
