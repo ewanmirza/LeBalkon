@@ -23,10 +23,6 @@ const inter = Inter({ subsets: ['latin'], weight: ['400', '500'], variable: '--f
 
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://lebalkonaksaray.com'),
-  title: { default: 'Le Balkon Lounge & Cafe | Aksaray', template: '%s' },
-};
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const c = await getContent();
