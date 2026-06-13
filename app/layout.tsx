@@ -1,3 +1,10 @@
+import type { Metadata } from 'next';
+import { Cormorant_Garamond, Inter } from 'next/font/google';
+import './globals.css';
+import Navbar from '@/components/site/Navbar';
+import Footer from '@/components/site/Footer';
+import { getContent } from '@/lib/content';
+
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://lebalkonaksaray.com'),
   title: { default: 'Le Balkon Lounge & Cafe | Aksaray', template: '%s' },
@@ -22,7 +29,6 @@ const cormorant = Cormorant_Garamond({ subsets: ['latin'], weight: ['400', '500'
 const inter = Inter({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-inter' });
 
 export const revalidate = 60;
-
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const c = await getContent();
