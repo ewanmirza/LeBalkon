@@ -33,52 +33,65 @@ function ItemRow({ it }: { it: MenuItem }) {
 }
 
 export default function MenuBrowser({ categories, items }: { categories: MenuCategory[]; items: MenuItem[] }) {
-  const [active, setActive] = useState(categories[0]?.id ?? '');
-  const [open, setOpen] = useState(categories[0]?.id ?? ''); // mobil akordeon
+  const [active, setActive] = useState(categories[0]?.id ?? '');     // masaüstü
+  const [mobileCat, setMobileCat] = useState<string | null>(null);   // mobil: null = kategori listesi
   const cat = categories.find((c) => c.id === active);
   const list = items.filter((i) => i.category_id === active);
 
+  const mCat = categories.find((c) => c.id === mobileCat);
+  const mList = items.filter((i) => i.category_id === mobileCat);
+
   return (
     <div>
-      {/* ===================== MOBİL: akordeon ===================== */}
+      {/* ===================== MOBİL: iki katmanlı geçiş ===================== */}
       <div className="md:hidden">
-        {categories.map((c) => {
-          const isOpen = open === c.id;
-          const clist = items.filter((i) => i.category_id === c.id);
-          return (
-            <div key={c.id} className="border-b border-gold/15">
-              <button
-                onClick={() => setOpen(isOpen ? '' : c.id)}
-                className="w-full flex items-center justify-between gap-3 py-4 text-left"
-                aria-expanded={isOpen}
-              >
-                <span className="flex items-baseline gap-2 min-w-0">
-                  <span className={`font-sans text-sm uppercase tracking-wide ${isOpen ? 'text-gold' : 'text-cream'}`}>
-                    {c.name}
-                  </span>
-                  <span className="font-sans text-xs text-muted2">{clist.length}</span>
-                </span>
-                <svg
-                  width="16" height="16" viewBox="0 0 24 24" fill="none"
-                  className={`flex-shrink-0 text-gold transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+        {mobileCat === null ? (
+          /* 1. katman: kategori listesi */
+          <div>
+            {categories.map((c) => {
+              const count = items.filter((i) => i.category_id === c.id).length;
+              return (
+                <button
+                  key={c.id}
+                  onClick={() => { setMobileCat(c.id); if (typeof window !== 'undefined') window.scrollTo({ top: 0 }); }}
+                  className="w-full flex items-center justify-between gap-3 py-4 border-b border-gold/15 text-left active:bg-dark-2 transition-colors"
                 >
-                  <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-              {isOpen && (
-                <div className="pb-6 pt-1 space-y-5">
-                  {c.description && (
-                    <p className="text-muted2 font-sans text-sm italic">{c.description}</p>
-                  )}
-                  {clist.map((it) => <ItemRow key={it.id} it={it} />)}
-                  {!clist.length && (
-                    <p className="text-muted2 font-sans text-sm py-4">Bu kategoriye henüz ürün eklenmedi.</p>
-                  )}
-                </div>
+                  <span className="flex items-baseline gap-2 min-w-0">
+                    <span className="font-heading text-lg text-cream">{c.name}</span>
+                    <span className="font-sans text-xs text-muted2">{count}</span>
+                  </span>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="flex-shrink-0 text-gold">
+                    <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          /* 2. katman: seçilen kategorinin ürünleri */
+          <div>
+            <button
+              onClick={() => setMobileCat(null)}
+              className="flex items-center gap-1.5 font-sans text-sm text-gold mb-5 active:opacity-70"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Tüm Kategoriler
+            </button>
+
+            <h2 className="font-heading font-medium text-2xl text-cream">{mCat?.name}</h2>
+            {mCat?.description && <p className="mt-2 text-muted2 font-sans text-sm italic">{mCat.description}</p>}
+            <div className="mt-4 mb-7 h-px w-14 bg-gold/40" />
+
+            <div className="space-y-6">
+              {mList.map((it) => <ItemRow key={it.id} it={it} />)}
+              {!mList.length && (
+                <p className="text-muted2 font-sans text-sm py-6">Bu kategoriye henüz ürün eklenmedi.</p>
               )}
             </div>
-          );
-        })}
+          </div>
+        )}
       </div>
 
       {/* ===================== MASAÜSTÜ: sol menü + içerik ===================== */}
