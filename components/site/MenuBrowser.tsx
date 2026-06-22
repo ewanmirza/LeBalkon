@@ -51,7 +51,7 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
   return (
     <div>
       {/* ===================== MOBİL ===================== */}
-      {/* 1. katman: kategori listesi (normal akış) */}
+      {/* 1. katman: kategori listesi (fotoğraflı) */}
       <div className="md:hidden">
         {categories.map((c) => {
           const count = items.filter((i) => i.category_id === c.id).length;
@@ -59,10 +59,19 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
             <button
               key={c.id}
               onClick={() => setMobileCat(c.id)}
-              className="w-full flex items-center justify-between gap-3 py-4 border-b border-gold/15 text-left active:bg-dark-2 transition-colors"
+              className="w-full flex items-center gap-4 py-3 border-b border-gold/15 text-left active:bg-dark-2 transition-colors"
             >
-              <span className="flex items-baseline gap-2 min-w-0">
-                <span className="font-heading text-lg text-cream">{c.name}</span>
+              {c.image_url ? (
+                <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-gold/15 bg-dark-2">
+                  <img src={c.image_url} alt={c.name} className="w-full h-full object-cover" loading="lazy" />
+                </div>
+              ) : (
+                <div className="w-14 h-14 rounded-xl flex-shrink-0 border border-gold/15 bg-dark-2 flex items-center justify-center">
+                  <span className="font-heading text-gold/70 text-lg">{c.name.charAt(0)}</span>
+                </div>
+              )}
+              <span className="flex-1 flex items-baseline gap-2 min-w-0">
+                <span className="font-heading text-lg text-cream truncate">{c.name}</span>
                 <span className="font-sans text-xs text-muted2">{count}</span>
               </span>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="flex-shrink-0 text-gold">
@@ -73,7 +82,7 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
         })}
       </div>
 
-      {/* 2. katman: tam ekran kategori detayı — başka hiçbir şey görünmez */}
+      {/* 2. katman: tam ekran kategori detayı */}
       {mobileCat !== null && (
         <div className="md:hidden fixed inset-0 z-[110] bg-dark overflow-y-auto overscroll-contain">
           <div className="container-site pt-[calc(env(safe-area-inset-top)+1.25rem)] pb-16 min-h-full">
@@ -86,6 +95,12 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
               </svg>
               Tüm Kategoriler
             </button>
+
+            {mCat?.image_url && (
+              <div className="w-full h-40 rounded-2xl overflow-hidden border border-gold/15 mb-5">
+                <img src={mCat.image_url} alt={mCat.name} className="w-full h-full object-cover" />
+              </div>
+            )}
 
             <h2 className="font-heading font-medium text-2xl text-cream">{mCat?.name}</h2>
             {mCat?.description && <p className="mt-2 text-muted2 font-sans text-sm italic">{mCat.description}</p>}
@@ -122,6 +137,11 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
         </nav>
 
         <div>
+          {cat?.image_url && (
+            <div className="w-full h-44 rounded-2xl overflow-hidden border border-gold/15 mb-6">
+              <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
+            </div>
+          )}
           <div className="mb-8">
             <h2 className="font-heading font-medium text-2xl md:text-3xl text-cream">{cat?.name}</h2>
             {cat?.description && <p className="mt-2 text-muted2 font-sans text-sm italic">{cat.description}</p>}
