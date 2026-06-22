@@ -36,3 +36,15 @@
   }
   .animate-menu { animation: menuFade .35s ease-out both; }
 }
+
+@layer utilities {
+  @keyframes pageFade {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-page { animation: pageFade .4s ease-out both; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-menu, .animate-page { animation: none !important; }
+}
