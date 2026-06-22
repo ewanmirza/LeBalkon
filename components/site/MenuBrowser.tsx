@@ -85,7 +85,7 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
       {/* 2. katman: tam ekran kategori detayı */}
       {mobileCat !== null && (
         <div className="md:hidden fixed inset-0 z-[110] bg-dark overflow-y-auto overscroll-contain">
-          <div className="container-site pt-[calc(env(safe-area-inset-top)+1.25rem)] pb-16 min-h-full">
+          <div key={mobileCat} className="container-site pt-[calc(env(safe-area-inset-top)+1.25rem)] pb-16 min-h-full animate-menu">
             <button
               onClick={() => setMobileCat(null)}
               className="flex items-center gap-1.5 font-sans text-sm text-gold mb-5 active:opacity-70"
@@ -136,7 +136,7 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
           </div>
         </nav>
 
-        <div>
+        <div key={active} className="animate-menu">
           {cat?.image_url && (
             <div className="w-full h-44 rounded-2xl overflow-hidden border border-gold/15 mb-6">
               <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
