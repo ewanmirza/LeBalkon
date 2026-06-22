@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { MenuCategory, MenuItem } from '@/lib/types';
 
 function ItemRow({ it }: { it: MenuItem }) {
@@ -41,35 +41,42 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
   const mCat = categories.find((c) => c.id === mobileCat);
   const mList = items.filter((i) => i.category_id === mobileCat);
 
+  // Mobil detay açıkken arka plan kaymasın
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    document.body.style.overflow = mobileCat ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileCat]);
+
   return (
     <div>
-      {/* ===================== MOBİL: iki katmanlı geçiş ===================== */}
+      {/* ===================== MOBİL ===================== */}
+      {/* 1. katman: kategori listesi (normal akış) */}
       <div className="md:hidden">
-        {mobileCat === null ? (
-          /* 1. katman: kategori listesi */
-          <div>
-            {categories.map((c) => {
-              const count = items.filter((i) => i.category_id === c.id).length;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => { setMobileCat(c.id); if (typeof window !== 'undefined') window.scrollTo({ top: 0 }); }}
-                  className="w-full flex items-center justify-between gap-3 py-4 border-b border-gold/15 text-left active:bg-dark-2 transition-colors"
-                >
-                  <span className="flex items-baseline gap-2 min-w-0">
-                    <span className="font-heading text-lg text-cream">{c.name}</span>
-                    <span className="font-sans text-xs text-muted2">{count}</span>
-                  </span>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="flex-shrink-0 text-gold">
-                    <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          /* 2. katman: seçilen kategorinin ürünleri */
-          <div>
+        {categories.map((c) => {
+          const count = items.filter((i) => i.category_id === c.id).length;
+          return (
+            <button
+              key={c.id}
+              onClick={() => setMobileCat(c.id)}
+              className="w-full flex items-center justify-between gap-3 py-4 border-b border-gold/15 text-left active:bg-dark-2 transition-colors"
+            >
+              <span className="flex items-baseline gap-2 min-w-0">
+                <span className="font-heading text-lg text-cream">{c.name}</span>
+                <span className="font-sans text-xs text-muted2">{count}</span>
+              </span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="flex-shrink-0 text-gold">
+                <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* 2. katman: tam ekran kategori detayı — başka hiçbir şey görünmez */}
+      {mobileCat !== null && (
+        <div className="md:hidden fixed inset-0 z-[60] bg-dark overflow-y-auto overscroll-contain">
+          <div className="container-site pt-6 pb-16 min-h-full">
             <button
               onClick={() => setMobileCat(null)}
               className="flex items-center gap-1.5 font-sans text-sm text-gold mb-5 active:opacity-70"
@@ -91,10 +98,10 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
               )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* ===================== MASAÜSTÜ: sol menü + içerik ===================== */}
+      {/* ===================== MASAÜSTÜ ===================== */}
       <div className="hidden md:grid md:grid-cols-[230px_1fr] md:gap-12 lg:gap-20">
         <nav>
           <div className="sticky top-28 border-l border-gold/15">
