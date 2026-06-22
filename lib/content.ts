@@ -12,6 +12,7 @@ export async function getSeo(path: string): Promise<Metadata> {
   const { data } = await sb.from('seo_pages').select('*').eq('path', path).single();
   const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://lebalkonaksaray.com';
   if (!data) return {};
+  const ogImage = data.og_image || `${base}/og.jpg`;
   return {
     title: data.title,
     description: data.description,
@@ -22,10 +23,10 @@ export async function getSeo(path: string): Promise<Metadata> {
       description: data.description,
       url: `${base}${path === '/' ? '' : path}`,
       siteName: 'Le Balkon Lounge & Cafe',
-      images: data.og_image ? [{ url: data.og_image }] : [],
+      images: [{ url: ogImage, width: 1200, height: 630 }],
       locale: 'tr_TR',
       type: 'website',
     },
-    twitter: { card: 'summary_large_image', title: data.title, description: data.description },
+    twitter: { card: 'summary_large_image', title: data.title, description: data.description, images: [ogImage] },
   };
 }
