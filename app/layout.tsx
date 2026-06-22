@@ -1,9 +1,10 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Cormorant_Garamond, Inter } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/site/Navbar';
 import Footer from '@/components/site/Footer';
 import { getContent } from '@/lib/content';
+import { ldScript } from '@/lib/jsonld';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'https://lebalkonaksaray.com'),
@@ -23,6 +24,12 @@ export const metadata: Metadata = {
     ],
   },
   manifest: '/site.webmanifest',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  themeColor: '#171614',
 };
 
 const cormorant = Cormorant_Garamond({ subsets: ['latin'], weight: ['400', '500', '600'], style: ['normal', 'italic'], variable: '--font-cormorant' });
@@ -49,7 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="tr" className={`${cormorant.variable} ${inter.variable}`}>
       <body>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldScript(jsonLd) }} />
         <Navbar siteName={c.site_name ?? 'LE BALKON'} />
         <main className="min-h-screen">{children}</main>
         <Footer content={c} />
