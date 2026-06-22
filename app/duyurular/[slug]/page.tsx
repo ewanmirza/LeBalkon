@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { CalendarDays, ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
+import { ldScript } from '@/lib/jsonld';
 
 export const revalidate = 60;
 
@@ -40,7 +41,7 @@ export default async function AnnouncementDetail({ params }: { params: { slug: s
 
   return (
     <article className="container-site pt-32 max-w-3xl">
-      {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />}
+      {jsonLd && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldScript(jsonLd) }} />}
       <Link href="/duyurular" className="inline-flex items-center gap-2 text-gold font-sans text-sm hover:text-cream transition-colors mb-8">
         <ArrowLeft size={15} /> Tüm Duyurular
       </Link>
