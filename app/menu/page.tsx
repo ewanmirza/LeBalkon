@@ -3,6 +3,7 @@ import { supabaseServer } from '@/lib/supabase-server';
 import SectionHeader from '@/components/site/SectionHeader';
 import MenuBrowser from '@/components/site/MenuBrowser';
 import type { Metadata } from 'next';
+import { ldScript } from '@/lib/jsonld';
 
 export const revalidate = 60;
 export async function generateMetadata(): Promise<Metadata> { return getSeo('/menu'); }
@@ -34,7 +35,7 @@ export default async function MenuPage() {
 
   return (
     <div className="container-site pt-32">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(menuJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldScript(menuJsonLd) }} />
       <SectionHeader eyebrow="Lezzetlerimiz" title="Menü" sub="Tüm fiyatlarımız güncel olup TL cinsindendir." />
       <MenuBrowser categories={cats.data ?? []} items={items.data ?? []} />
     </div>
