@@ -75,8 +75,8 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
 
       {/* 2. katman: tam ekran kategori detayı — başka hiçbir şey görünmez */}
       {mobileCat !== null && (
-        <div className="md:hidden fixed inset-0 z-[60] bg-dark overflow-y-auto overscroll-contain">
-          <div className="container-site pt-6 pb-16 min-h-full">
+        <div className="md:hidden fixed inset-0 z-[110] bg-dark overflow-y-auto overscroll-contain">
+          <div className="container-site pt-[calc(env(safe-area-inset-top)+1.25rem)] pb-16 min-h-full">
             <button
               onClick={() => setMobileCat(null)}
               className="flex items-center gap-1.5 font-sans text-sm text-gold mb-5 active:opacity-70"
