@@ -73,6 +73,7 @@ export default function MenuAdmin() {
   async function saveItem(id: string, patch: Partial<MenuItem>) {
     await sb.from('menu_items').update(patch).eq('id', id);
     load();
+    fetch('/api/revalidate', { method: 'POST' }).catch(() => {});
   }
   async function deleteItem(it: MenuItem) {
     if (!confirm(`"${it.name}" silinsin mi?`)) return;
