@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import type { MenuCategory, MenuItem } from '@/lib/types';
 
 function ItemRow({ it }: { it: MenuItem }) {
@@ -7,8 +8,8 @@ function ItemRow({ it }: { it: MenuItem }) {
   return (
     <div className="flex gap-4">
       {imgs[0] && (
-        <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0 border border-gold/10">
-          <img src={imgs[0].url} alt={it.name} className="w-full h-full object-cover" loading="lazy" />
+        <div className="relative w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden flex-shrink-0 border border-gold/10 bg-dark-2">
+          <Image src={imgs[0].url} alt={it.name} fill sizes="80px" quality={70} className="object-cover" />
         </div>
       )}
       <div className="flex-1 min-w-0">
@@ -23,7 +24,8 @@ function ItemRow({ it }: { it: MenuItem }) {
         {imgs.length > 1 && (
           <div className="flex gap-2 mt-2">
             {imgs.slice(1, 4).map((im) => (
-              <img key={im.id} src={im.url} alt="" className="w-10 h-10 rounded-lg object-cover border border-gold/10" loading="lazy" />
+              <Image key={im.id} src={im.url} alt="" width={40} height={40} quality={70}
+                className="w-10 h-10 rounded-lg object-cover border border-gold/10" />
             ))}
           </div>
         )}
@@ -62,8 +64,8 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
               className="w-full flex items-center gap-4 py-3 border-b border-gold/15 text-left active:bg-dark-2 transition-colors"
             >
               {c.image_url ? (
-                <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-gold/15 bg-dark-2">
-                  <img src={c.image_url} alt={c.name} className="w-full h-full object-cover" loading="lazy" />
+                <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border border-gold/15 bg-dark-2">
+                  <Image src={c.image_url} alt={c.name} fill sizes="56px" quality={70} className="object-cover" />
                 </div>
               ) : (
                 <div className="w-14 h-14 rounded-xl flex-shrink-0 border border-gold/15 bg-dark-2 flex items-center justify-center">
@@ -97,8 +99,8 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
             </button>
 
             {mCat?.image_url && (
-              <div className="w-full h-40 rounded-2xl overflow-hidden border border-gold/15 mb-5">
-                <img src={mCat.image_url} alt={mCat.name} className="w-full h-full object-cover" />
+              <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-gold/15 mb-5 bg-dark-2">
+                <Image src={mCat.image_url} alt={mCat.name} fill sizes="100vw" quality={75} className="object-cover" />
               </div>
             )}
 
@@ -138,8 +140,8 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
 
         <div key={active} className="animate-menu">
           {cat?.image_url && (
-            <div className="w-full h-44 rounded-2xl overflow-hidden border border-gold/15 mb-6">
-              <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
+            <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-gold/15 mb-6 bg-dark-2">
+              <Image src={cat.image_url} alt={cat.name} fill sizes="(min-width: 768px) 70vw, 100vw" quality={75} className="object-cover" />
             </div>
           )}
           <div className="mb-8">
