@@ -3,18 +3,14 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import type { MenuCategory, MenuItem } from '@/lib/types';
 
-function ItemRow({ it, onOpen }: { it: MenuItem; onOpen: (url: string, name: string) => void }) {
+function ItemRow({ it }: { it: MenuItem }) {
   const imgs = (it.menu_item_images ?? []).slice().sort((a, b) => a.sort_order - b.sort_order);
   return (
     <div className="flex gap-4">
       {imgs[0] && (
-        <button
-          onClick={() => onOpen(imgs[0].url, it.name)}
-          className="relative w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden flex-shrink-0 border border-gold/15 bg-dark-2 active:opacity-80 transition-opacity"
-          aria-label={`${it.name} fotoğrafını büyüt`}
-        >
+        <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden flex-shrink-0 border border-gold/15 bg-dark-2">
           <Image src={imgs[0].url} alt={it.name} fill sizes="112px" quality={75} className="object-cover" />
-        </button>
+        </div>
       )}
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline gap-3">
@@ -28,10 +24,8 @@ function ItemRow({ it, onOpen }: { it: MenuItem; onOpen: (url: string, name: str
         {imgs.length > 1 && (
           <div className="flex gap-2 mt-2">
             {imgs.slice(1, 5).map((im) => (
-              <button key={im.id} onClick={() => onOpen(im.url, it.name)} className="active:opacity-80">
-                <Image src={im.url} alt="" width={48} height={48} quality={70}
-                  className="w-12 h-12 rounded-lg object-cover border border-gold/10" />
-              </button>
+              <Image key={im.id} src={im.url} alt="" width={48} height={48} quality={70}
+                className="w-12 h-12 rounded-lg object-cover border border-gold/10" />
             ))}
           </div>
         )}
@@ -40,48 +34,9 @@ function ItemRow({ it, onOpen }: { it: MenuItem; onOpen: (url: string, name: str
   );
 }
 
-function Lightbox({ url, name, onClose }: { url: string; name: string; onClose: () => void }) {
-  return (
-    <div
-      onClick={onClose}
-      className="fixed inset-0 z-[120] bg-black/92 flex items-center justify-center p-4 animate-page"
-    >
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 text-white/80 hover:text-white p-2 z-10"
-        aria-label="Kapat"
-      >
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-      </button>
-
-      <div className="relative max-w-[92vw] max-h-[88vh]" onClick={(e) => e.stopPropagation()}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt={name} className="max-w-[92vw] max-h-[88vh] object-contain rounded-xl" />
-
-        {/* Balkon filigranı */}
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden rounded-xl">
-          <div className="rotate-[-25deg] select-none">
-            {Array.from({ length: 7 }).map((_, i) => (
-              <div key={i} className="whitespace-nowrap text-white/15 font-heading tracking-[0.3em] text-xl md:text-3xl py-3">
-                LE BALKON&nbsp;&nbsp;·&nbsp;&nbsp;LE BALKON&nbsp;&nbsp;·&nbsp;&nbsp;LE BALKON&nbsp;&nbsp;·&nbsp;&nbsp;LE BALKON
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <p className="absolute bottom-3 left-0 right-0 text-center text-white/85 font-heading text-lg drop-shadow">{name}</p>
-      </div>
-    </div>
-  );
-}
-
 export default function MenuBrowser({ categories, items }: { categories: MenuCategory[]; items: MenuItem[] }) {
   const [active, setActive] = useState(categories[0]?.id ?? '');
   const [mobileCat, setMobileCat] = useState<string | null>(null);
-  const [lightbox, setLightbox] = useState<{ url: string; name: string } | null>(null);
-  const openImg = (url: string, name: string) => setLightbox({ url, name });
 
   const cat = categories.find((c) => c.id === active);
   const list = items.filter((i) => i.category_id === active);
@@ -90,9 +45,9 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    document.body.style.overflow = mobileCat || lightbox ? 'hidden' : '';
+    document.body.style.overflow = mobileCat ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [mobileCat, lightbox]);
+  }, [mobileCat]);
 
   return (
     <div>
@@ -129,14 +84,20 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
 
       {mobileCat !== null && (
         <div className="md:hidden fixed inset-0 z-[110] bg-dark overflow-y-auto overscroll-contain">
-          <div key={mobileCat} className="container-site pt-[calc(env(safe-area-inset-top)+1.25rem)] pb-16 min-h-full animate-menu">
-            <button onClick={() => setMobileCat(null)} className="flex items-center gap-1.5 font-sans text-sm text-gold mb-5 active:opacity-70">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Tüm Kategoriler
-            </button>
+          {/* Sabit geri çubuğu — kaydırınca hep üstte kalır */}
+          <div className="sticky top-0 z-10 bg-dark/95 backdrop-blur-md border-b border-gold/15 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
+            <div className="container-site py-3 flex items-center justify-between">
+              <button onClick={() => setMobileCat(null)} className="flex items-center gap-1.5 font-sans text-sm text-gold active:opacity-70">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                Tüm Kategoriler
+              </button>
+              <span className="font-heading text-cream text-sm truncate max-w-[55%]">{mCat?.name}</span>
+            </div>
+          </div>
 
+          <div key={mobileCat} className="container-site pt-5 pb-16 animate-menu">
             {mCat?.image_url && (
               <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-gold/15 mb-5 bg-dark-2">
                 <Image src={mCat.image_url} alt={mCat.name} fill sizes="100vw" quality={75} className="object-cover" />
@@ -148,7 +109,7 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
             <div className="mt-4 mb-7 h-px w-14 bg-gold/40" />
 
             <div className="space-y-6">
-              {mList.map((it) => <ItemRow key={it.id} it={it} onOpen={openImg} />)}
+              {mList.map((it) => <ItemRow key={it.id} it={it} />)}
               {!mList.length && <p className="text-muted2 font-sans text-sm py-6">Bu kategoriye henüz ürün eklenmedi.</p>}
             </div>
           </div>
@@ -185,15 +146,13 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
             <div className="mt-4 h-px w-14 bg-gold/40" />
           </div>
           <div className="grid gap-x-12 gap-y-7 md:grid-cols-2">
-            {list.map((it) => <ItemRow key={it.id} it={it} onOpen={openImg} />)}
+            {list.map((it) => <ItemRow key={it.id} it={it} />)}
             {!list.length && (
               <p className="text-muted2 font-sans text-sm md:col-span-2 text-center py-10">Bu kategoriye henüz ürün eklenmedi.</p>
             )}
           </div>
         </div>
       </div>
-
-      {lightbox && <Lightbox url={lightbox.url} name={lightbox.name} onClose={() => setLightbox(null)} />}
     </div>
   );
 }
