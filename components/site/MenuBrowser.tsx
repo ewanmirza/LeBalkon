@@ -67,8 +67,8 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
 
       <div key={mCat} className="container-site pt-5 pb-16 animate-menu">
         {curCat.image_url && (
-          <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-gold/15 mb-5 bg-dark-2">
-            <Image src={curCat.image_url} alt={curCat.name} fill sizes="100vw" quality={75} className="object-cover" />
+          <div className="relative w-full h-36 rounded-2xl overflow-hidden border border-gold/15 mb-5 bg-white">
+            <Image src={curCat.image_url} alt={curCat.name} fill sizes="100vw" quality={75} className="object-contain p-2" />
           </div>
         )}
         <h2 className="font-heading font-medium text-[32px] leading-tight text-cream">{curCat.name}</h2>
@@ -94,9 +94,9 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
           return (
             <div key={c.id} className="mb-7">
               <button onClick={() => setMCat(c.id)} className="block w-full text-left active:opacity-90">
-                <div className="relative w-full h-44 rounded-xl overflow-hidden border border-gold/10 bg-dark-2">
+                <div className={`relative w-full h-32 rounded-xl overflow-hidden border border-gold/10 ${c.image_url ? 'bg-white' : 'bg-dark-2'}`}>
                   {c.image_url ? (
-                    <Image src={c.image_url} alt={c.name} fill sizes="100vw" quality={75} className="object-cover" />
+                    <Image src={c.image_url} alt={c.name} fill sizes="100vw" quality={75} className="object-contain p-2" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center font-sans text-[11px] tracking-[0.2em] uppercase text-muted2">
                       Le Balkon
@@ -138,8 +138,8 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
 
         <div key={active} className="animate-menu">
           {cat?.image_url && (
-            <div className="relative w-full h-52 rounded-2xl overflow-hidden border border-gold/15 mb-6 bg-dark-2">
-              <Image src={cat.image_url} alt={cat.name} fill sizes="(min-width: 768px) 70vw, 100vw" quality={75} className="object-cover" />
+            <div className="relative w-full h-52 rounded-2xl overflow-hidden border border-gold/15 mb-6 bg-white">
+              <Image src={cat.image_url} alt={cat.name} fill sizes="(min-width: 768px) 70vw, 100vw" quality={75} className="object-contain p-4" />
             </div>
           )}
           <div className="mb-8">
