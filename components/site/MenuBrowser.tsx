@@ -67,7 +67,7 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
 
       <div key={mCat} className="container-site pt-5 pb-16 animate-menu">
         {curCat.image_url && (
-          <div className="relative w-full h-36 rounded-2xl overflow-hidden border border-gold/15 mb-5 bg-white">
+          <div className="relative w-full h-40 rounded-2xl overflow-hidden border border-gold/15 mb-5 bg-white">
             <Image src={curCat.image_url} alt={curCat.name} fill sizes="100vw" quality={75} className="object-contain p-2" />
           </div>
         )}
@@ -94,7 +94,7 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
           return (
             <div key={c.id} className="mb-7">
               <button onClick={() => setMCat(c.id)} className="block w-full text-left active:opacity-90">
-                <div className={`relative w-full h-32 rounded-xl overflow-hidden border border-gold/10 ${c.image_url ? 'bg-white' : 'bg-dark-2'}`}>
+                <div className={`relative w-full h-36 rounded-xl overflow-hidden border border-gold/10 ${c.image_url ? 'bg-white' : 'bg-dark-2'}`}>
                   {c.image_url ? (
                     <Image src={c.image_url} alt={c.name} fill sizes="100vw" quality={75} className="object-contain p-2" />
                   ) : (
