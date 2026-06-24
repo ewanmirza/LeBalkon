@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import type { MenuCategory, MenuItem } from '@/lib/types';
 
@@ -37,6 +38,9 @@ function ItemRow({ it }: { it: MenuItem }) {
 export default function MenuBrowser({ categories, items }: { categories: MenuCategory[]; items: MenuItem[] }) {
   const [active, setActive] = useState(categories[0]?.id ?? '');
   const [mobileCat, setMobileCat] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
 
   const cat = categories.find((c) => c.id === active);
   const list = items.filter((i) => i.category_id === active);
@@ -49,9 +53,43 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
     return () => { document.body.style.overflow = ''; };
   }, [mobileCat]);
 
+  // Mobil kategori detayı — Portal ile body'ye taşınır (navbar dahil her şeyin üstünde)
+  const mobileOverlay = mobileCat !== null && (
+    <div className="md:hidden fixed inset-0 z-[2147483000] bg-dark overflow-y-auto overscroll-contain">
+      <div className="sticky top-0 z-10 bg-dark/95 backdrop-blur-md border-b border-gold/15 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
+        <div className="container-site py-3 flex items-center justify-between">
+          <button onClick={() => setMobileCat(null)} className="flex items-center gap-1.5 font-sans text-sm text-gold active:opacity-70">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Tüm Kategoriler
+          </button>
+          <span className="font-heading text-cream text-sm truncate max-w-[55%]">{mCat?.name}</span>
+        </div>
+      </div>
+
+      <div key={mobileCat} className="container-site pt-5 pb-16 animate-menu">
+        {mCat?.image_url && (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-gold/15 mb-5 bg-dark-2">
+            <Image src={mCat.image_url} alt={mCat.name} fill sizes="100vw" quality={75} className="object-cover" />
+          </div>
+        )}
+
+        <h2 className="font-heading font-medium text-2xl text-cream">{mCat?.name}</h2>
+        {mCat?.description && <p className="mt-2 text-muted2 font-sans text-sm italic">{mCat.description}</p>}
+        <div className="mt-4 mb-7 h-px w-14 bg-gold/40" />
+
+        <div className="space-y-6">
+          {mList.map((it) => <ItemRow key={it.id} it={it} />)}
+          {!mList.length && <p className="text-muted2 font-sans text-sm py-6">Bu kategoriye henüz ürün eklenmedi.</p>}
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div>
-      {/* ===================== MOBİL ===================== */}
+      {/* ===================== MOBİL: kategori listesi ===================== */}
       <div className="md:hidden">
         {categories.map((c) => {
           const count = items.filter((i) => i.category_id === c.id).length;
@@ -82,39 +120,7 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
         })}
       </div>
 
-      {mobileCat !== null && (
-        <div className="md:hidden fixed inset-0 z-[110] bg-dark overflow-y-auto overscroll-contain">
-          {/* Sabit geri çubuğu — kaydırınca hep üstte kalır */}
-          <div className="sticky top-0 z-10 bg-dark/95 backdrop-blur-md border-b border-gold/15 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
-            <div className="container-site py-3 flex items-center justify-between">
-              <button onClick={() => setMobileCat(null)} className="flex items-center gap-1.5 font-sans text-sm text-gold active:opacity-70">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                  <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                Tüm Kategoriler
-              </button>
-              <span className="font-heading text-cream text-sm truncate max-w-[55%]">{mCat?.name}</span>
-            </div>
-          </div>
-
-          <div key={mobileCat} className="container-site pt-5 pb-16 animate-menu">
-            {mCat?.image_url && (
-              <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-gold/15 mb-5 bg-dark-2">
-                <Image src={mCat.image_url} alt={mCat.name} fill sizes="100vw" quality={75} className="object-cover" />
-              </div>
-            )}
-
-            <h2 className="font-heading font-medium text-2xl text-cream">{mCat?.name}</h2>
-            {mCat?.description && <p className="mt-2 text-muted2 font-sans text-sm italic">{mCat.description}</p>}
-            <div className="mt-4 mb-7 h-px w-14 bg-gold/40" />
-
-            <div className="space-y-6">
-              {mList.map((it) => <ItemRow key={it.id} it={it} />)}
-              {!mList.length && <p className="text-muted2 font-sans text-sm py-6">Bu kategoriye henüz ürün eklenmedi.</p>}
-            </div>
-          </div>
-        </div>
-      )}
+      {mounted && mobileOverlay && createPortal(mobileOverlay, document.body)}
 
       {/* ===================== MASAÜSTÜ ===================== */}
       <div className="hidden md:grid md:grid-cols-[230px_1fr] md:gap-12 lg:gap-20">
