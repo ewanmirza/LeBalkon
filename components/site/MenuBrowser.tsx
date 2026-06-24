@@ -8,23 +8,28 @@ const price = (p: number | string) => `${Number(p).toFixed(0)} ₺`;
 const firstImg = (it?: MenuItem) =>
   it?.menu_item_images?.slice().sort((a, b) => a.sort_order - b.sort_order)[0]?.url;
 
-/* Masaüstü ürün satırı */
-function DeskRow({ it }: { it: MenuItem }) {
+/* Fotoğraflı ürün satırı (hem mobil hem masaüstü) */
+function ItemCard({ it }: { it: MenuItem }) {
   const img = firstImg(it);
   return (
-    <div className="flex gap-4">
-      {img && (
-        <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-xl overflow-hidden flex-shrink-0 border border-gold/15 bg-dark-2">
+    <div className="flex gap-4 py-4 border-t border-gold/10 first:border-t-0">
+      {img ? (
+        <div className="relative w-28 h-28 rounded-xl overflow-hidden flex-shrink-0 border border-gold/15 bg-dark-2">
           <Image src={img} alt={it.name} fill sizes="112px" quality={75} className="object-cover" />
+        </div>
+      ) : (
+        <div className="w-28 h-28 rounded-xl flex-shrink-0 border border-gold/15 bg-dark-2 flex items-center justify-center font-sans text-[10px] tracking-[0.18em] uppercase text-muted2">
+          Le Balkon
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <div className="flex items-baseline gap-3">
-          <h3 className="text-lg text-cream">{it.name}</h3>
-          <span className="flex-1 dotted-line translate-y-[-4px]" />
-          <span className="text-gold font-medium whitespace-nowrap">{price(it.price)}</span>
+        <div className="flex items-baseline justify-between gap-3">
+          <h3 className="font-heading font-medium text-xl text-cream leading-tight">{it.name}</h3>
+          <span className="font-sans text-[15px] text-gold whitespace-nowrap">{price(it.price)}</span>
         </div>
-        {it.description && <p className="mt-1.5 text-muted2 font-sans text-sm leading-relaxed">{it.description}</p>}
+        {it.description && (
+          <p className="mt-1.5 font-sans text-[12.5px] text-muted2 leading-relaxed">{it.description}</p>
+        )}
       </div>
     </div>
   );
@@ -33,7 +38,6 @@ function DeskRow({ it }: { it: MenuItem }) {
 export default function MenuBrowser({ categories, items }: { categories: MenuCategory[]; items: MenuItem[] }) {
   const [active, setActive] = useState(categories[0]?.id ?? '');   // masaüstü
   const [mCat, setMCat] = useState<string | null>(null);           // mobil kategori
-  const [mItem, setMItem] = useState<string | null>(null);         // mobil ürün detay
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -41,37 +45,38 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
   const cat = categories.find((c) => c.id === active);
   const list = itemsOf(active);
   const curCat = categories.find((c) => c.id === mCat);
-  const curItem = items.find((i) => i.id === mItem);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    document.body.style.overflow = mCat || mItem ? 'hidden' : '';
+    document.body.style.overflow = mCat ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
-  }, [mCat, mItem]);
+  }, [mCat]);
 
-  /* ---------- MOBİL: ürün listesi (katman 2) ---------- */
-  const itemsOverlay = curCat && !curItem && (
+  /* ---------- MOBİL: ürün listesi (fotoğraflı) ---------- */
+  const itemsOverlay = curCat && (
     <div className="md:hidden fixed inset-0 z-[2147483000] bg-dark overflow-y-auto overscroll-contain">
-      <div className="container-site pt-[calc(env(safe-area-inset-top)+1.25rem)] pb-16 animate-menu">
-        <button onClick={() => setMCat(null)}
-          className="flex items-center gap-2 font-sans text-xs tracking-[0.14em] uppercase text-muted2 mb-5 active:opacity-70">
-          <span className="text-gold text-base leading-none">←</span> Menü
-        </button>
-        <h2 className="font-heading font-medium text-[34px] leading-tight text-cream px-1">{curCat.name}</h2>
-        {curCat.description && (
-          <p className="font-sans text-xs tracking-wide text-muted2 px-1 pb-5 pt-1">{curCat.description}</p>
+      {/* sabit geri çubuğu */}
+      <div className="sticky top-0 z-10 bg-dark/95 backdrop-blur-md border-b border-gold/15 pt-[calc(env(safe-area-inset-top)+0.5rem)]">
+        <div className="container-site py-3 flex items-center justify-between">
+          <button onClick={() => setMCat(null)} className="flex items-center gap-2 font-sans text-xs tracking-[0.14em] uppercase text-gold active:opacity-70">
+            <span className="text-base leading-none">←</span> Menü
+          </button>
+          <span className="font-heading text-cream text-sm truncate max-w-[55%]">{curCat.name}</span>
+        </div>
+      </div>
+
+      <div key={mCat} className="container-site pt-5 pb-16 animate-menu">
+        {curCat.image_url && (
+          <div className="relative w-full h-44 rounded-2xl overflow-hidden border border-gold/15 mb-5 bg-dark-2">
+            <Image src={curCat.image_url} alt={curCat.name} fill sizes="100vw" quality={75} className="object-cover" />
+          </div>
         )}
-        <div>
-          {itemsOf(curCat.id).map((it) => (
-            <button key={it.id} onClick={() => setMItem(it.id)}
-              className="w-full flex items-baseline justify-between gap-4 py-4 px-1 text-left border-t border-gold/10 active:bg-dark-2 transition-colors">
-              <span className="flex-1 min-w-0">
-                <span className="block font-heading font-medium text-xl text-cream mb-0.5">{it.name}</span>
-                {it.description && <span className="block font-sans text-[12.5px] text-muted2 leading-relaxed">{it.description}</span>}
-              </span>
-              <span className="font-sans text-[15px] text-gold whitespace-nowrap">{price(it.price)}</span>
-            </button>
-          ))}
+        <h2 className="font-heading font-medium text-[32px] leading-tight text-cream">{curCat.name}</h2>
+        {curCat.description && (
+          <p className="font-sans text-xs tracking-wide text-muted2 pt-1 pb-3">{curCat.description}</p>
+        )}
+        <div className="mt-3">
+          {itemsOf(curCat.id).map((it) => <ItemCard key={it.id} it={it} />)}
           {!itemsOf(curCat.id).length && (
             <p className="text-muted2 font-sans text-sm py-6">Bu kategoriye henüz ürün eklenmedi.</p>
           )}
@@ -80,39 +85,9 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
     </div>
   );
 
-  /* ---------- MOBİL: ürün detay (katman 3) ---------- */
-  const detailOverlay = curItem && (
-    <div className="md:hidden fixed inset-0 z-[2147483000] bg-dark overflow-y-auto overscroll-contain animate-menu">
-      <div className="relative w-full h-80 bg-dark-2">
-        {firstImg(curItem) ? (
-          <Image src={firstImg(curItem)!} alt={curItem.name} fill sizes="100vw" quality={80} className="object-cover" priority />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center font-sans text-xs tracking-[0.2em] uppercase text-muted2">
-            Le Balkon
-          </div>
-        )}
-        <button onClick={() => setMItem(null)}
-          className="absolute top-[calc(env(safe-area-inset-top)+1rem)] left-4 w-10 h-10 rounded-full bg-dark/60 backdrop-blur-md border border-gold/20 flex items-center justify-center text-cream text-lg active:opacity-70">
-          ←
-        </button>
-      </div>
-      <div className="container-site pt-7 pb-16">
-        <div className="font-sans text-[10px] tracking-[0.24em] uppercase text-gold mb-2.5">{curCat?.name}</div>
-        <div className="flex items-start justify-between gap-4">
-          <h2 className="font-heading font-medium text-[36px] leading-[1.05] text-cream">{curItem.name}</h2>
-          <span className="font-heading text-2xl text-gold whitespace-nowrap mt-1">{price(curItem.price)}</span>
-        </div>
-        <div className="h-px bg-gold/15 my-6" />
-        {curItem.description && (
-          <p className="font-sans text-sm leading-[1.85] text-muted2">{curItem.description}</p>
-        )}
-      </div>
-    </div>
-  );
-
   return (
     <div>
-      {/* ===================== MOBİL: kategori kartları (katman 1) ===================== */}
+      {/* ===================== MOBİL: kategori kartları ===================== */}
       <div className="md:hidden">
         {categories.map((c) => {
           const count = itemsOf(c.id).length;
@@ -145,7 +120,6 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
       </div>
 
       {mounted && itemsOverlay && createPortal(itemsOverlay, document.body)}
-      {mounted && detailOverlay && createPortal(detailOverlay, document.body)}
 
       {/* ===================== MASAÜSTÜ: sol menü + içerik ===================== */}
       <div className="hidden md:grid md:grid-cols-[230px_1fr] md:gap-12 lg:gap-20">
@@ -173,8 +147,8 @@ export default function MenuBrowser({ categories, items }: { categories: MenuCat
             {cat?.description && <p className="mt-2 text-muted2 font-sans text-sm italic">{cat.description}</p>}
             <div className="mt-4 h-px w-14 bg-gold/40" />
           </div>
-          <div className="grid gap-x-12 gap-y-7 md:grid-cols-2">
-            {list.map((it) => <DeskRow key={it.id} it={it} />)}
+          <div className="grid gap-x-12 gap-y-2 md:grid-cols-2">
+            {list.map((it) => <ItemCard key={it.id} it={it} />)}
             {!list.length && (
               <p className="text-muted2 font-sans text-sm md:col-span-2 text-center py-10">Bu kategoriye henüz ürün eklenmedi.</p>
             )}
